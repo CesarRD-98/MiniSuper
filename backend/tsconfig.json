@@ -11,9 +11,10 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
+      "@common/*": ["common/*"],
       "@categoria/*": ["categoria/*"],
       "@producto/*": ["producto/*"],
-      "@usuario/*": ["usuario/*"],
+      "@usuario/*": ["usuario/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

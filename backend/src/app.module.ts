@@ -8,6 +8,7 @@ import { Producto } from '@producto/entities/producto.entity';
 import { CategoriaModule } from '@categoria/categoria.module';
 import { ProductoModule } from '@producto/producto.module';
 import { UsuarioModule } from './usuario/usuario.module';
+import { ResponseModule } from '@common/services/response/response.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UsuarioModule } from './usuario/usuario.module';
         autoLoadEntities: true
       })
     }),
+    ResponseModule,
     CategoriaModule,
     ProductoModule,
     UsuarioModule
@@ -36,4 +38,4 @@ import { UsuarioModule } from './usuario/usuario.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
