@@ -1,5 +1,4 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
-import { isArray, isString } from "class-validator";
 import { Response } from "express";
 
 @Catch()
@@ -30,7 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
                 if (typeof res.error === 'string') {
                     code = res.error.toUpperCase().replace(/ /g, '_')
-                } else if (typeof res.error === 'string') {
+                } else if (typeof res.code === 'string') {
                     code = res.code
                 }
 
