@@ -9,6 +9,7 @@ import { CategoriaModule } from '@categoria/categoria.module';
 import { ProductoModule } from '@producto/producto.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ResponseModule } from '@common/services/response/response.module';
+import { Usuario } from '@usuario/entities/usuario.entity';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { ResponseModule } from '@common/services/response/response.module';
         username: config.get<string>('DB_USER'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [Categoria, Producto],
+        entities: [Categoria, Producto, Usuario],
         synchronize: true,
         autoLoadEntities: true
       })

@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from 'common/filters/http-exception.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -14,6 +16,9 @@ async function bootstrap() {
   )
 
   app.useGlobalFilters(new GlobalExceptionFilter())
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/'
+  })
 
   const config = app.get(ConfigService)
   const port = config.get<number>('PORT') ?? 5000

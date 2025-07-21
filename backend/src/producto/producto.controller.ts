@@ -1,39 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseInterceptors, UsePipes, UploadedFile, Req } from '@nestjs/common';
 import { ProductoService } from './producto.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '@common/config/multer.config';
+import { Request } from 'express';
 
 @Controller('producto')
 export class ProductoController {
-  constructor(private readonly productoService: ProductoService) {}
+  constructor(
+    private readonly productoService: ProductoService
+  ) { }
 
   @Post()
-  create(@Body() dto: CreateProductoDto) {
-    return this.productoService.create(dto);
+  async create(@Body() dto: CreateProductoDto) {
+    return await this.productoService.create(dto);
+  }
+
+  @Post('imagen/:id')
+  @UseInterceptors(FileInterceptor('image', multerOptions))
+  async uploadImage(
+    @Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File, @Req() req: Request
+  ) {
+    return this.productoService.updateImage(id, file.filename, req)
   }
 
   @Get()
-  findAll() {
-    return this.productoService.findAll();
+  async findAll(@Req() req: Request) {
+    return this.productoService.findAll(req);
   }
 
-  @Get(':categoryId')
-  findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.productoService.findByCategory(categoryId)
+  @Get('categoria/:id')
+  async findByCategory(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    return this.productoService.findByCategory(id, req)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productoService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    return this.productoService.findOne(id, req);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto) {
-    return this.productoService.update(+id, updateProductoDto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductoDto, @Req() req: Request) {
+    return this.productoService.update(id, dto, req);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productoService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.productoService.remove(id);
   }
 }
