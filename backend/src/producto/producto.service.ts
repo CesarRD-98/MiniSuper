@@ -10,6 +10,7 @@ import { join } from 'path';
 import * as fs from 'fs'
 import { Request } from 'express';
 import { getPublicImageUrl } from '@common/helpers/public-url.helper';
+import { ResponseController } from '@common/services/response/response.controller';
 
 @Injectable()
 export class ProductoService {
@@ -18,7 +19,6 @@ export class ProductoService {
     private productRepository: Repository<Producto>,
     @InjectRepository(Categoria)
     private categoryRepository: Repository<Categoria>,
-    private readonly responseService: ResponseService
   ) { }
 
   private formatProduct(product: Producto, req: Request) {
@@ -51,11 +51,7 @@ export class ProductoService {
       category
     })
 
-    await this.productRepository.save(newProduct)
-
-    return this.responseService.success(
-      'PRODUCT_CREATED', { productoId: newProduct.id }, 'Producto creado exitosamente'
-    )
+    return this.productRepository.save(newProduct)
   }
 
   // ### updateImage function ###
@@ -78,20 +74,14 @@ export class ProductoService {
     product.imageUrl = filename
     await this.productRepository.save(product)
 
-    const imgUrl = getPublicImageUrl(req, filename)
-
-    return this.responseService.success(
-      'IMAGE_UPDATED', { url: imgUrl }, 'Imagen actualizada exitosamente'
-    )
+    return getPublicImageUrl(req, filename)
   }
 
   // ### getAll function ###
   async findAll(req: Request) {
     const products = await this.productRepository.find()
     const data = products.map(product => this.formatProduct(product, req))
-    return this.responseService.success(
-      'PRODUCTS_FOUND', data, 'Productos encontrados exitosamente'
-    )
+    return data
   }
 
   // ### getAllByCategory function ###
@@ -110,10 +100,7 @@ export class ProductoService {
     })
 
     const data = products.map(product => this.formatProduct(product, req))
-
-    return this.responseService.success(
-      'PRODUCTS_BY_CATEGORY_FOUND', data, 'Productos encontrados por categoria exitosamente'
-    )
+    return data
   }
 
   // ### getOne function ###
@@ -125,10 +112,7 @@ export class ProductoService {
         code: 'PRODUCT_NOT_FOUND', message: 'Producto no encontrado', data: null
       }, HttpStatus.NOT_FOUND)
     }
-
-    return this.responseService.success(
-      'PRODUCT_FOUND', this.formatProduct(product, req), 'Producto encontrado exitosamente'
-    )
+    return this.formatProduct(product, req)
   }
 
   // ### update function ###
@@ -152,13 +136,11 @@ export class ProductoService {
       product.category = category
     }
 
-    const { categoryId, ..._dto } = dto
-    this.productRepository.merge(product, _dto)
+    const { categoryId, ...Dto } = dto
+    this.productRepository.merge(product, Dto)
     await this.productRepository.save(product)
 
-    return this.responseService.success(
-      'PRODUCT_UPDATED', this.formatProduct(product, req), 'Producto actualizado exitosamente'
-    )
+    return this.formatProduct(product, req)
   }
 
   // ### delete function ###
@@ -171,10 +153,6 @@ export class ProductoService {
       }, HttpStatus.NOT_FOUND)
     }
 
-    await this.productRepository.remove(product)
-
-    return this.responseService.success(
-      'PRODUCT_DELETED', null, 'Producto eliminado exitosamente'
-    )
+    return this.productRepository.remove(product)
   }
 }

@@ -5,16 +5,24 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '@common/config/multer.config';
 import { Request } from 'express';
+import { ResponseController } from '@common/services/response/response.controller';
+import { ResponseService } from '@common/services/response/response.service';
 
 @Controller('producto')
-export class ProductoController {
+export class ProductoController extends ResponseController {
   constructor(
-    private readonly productoService: ProductoService
-  ) { }
+    private readonly productoService: ProductoService,
+    responseService: ResponseService
+  ) {
+    super(responseService)
+  }
 
   @Post()
   async create(@Body() dto: CreateProductoDto) {
-    return await this.productoService.create(dto);
+    const product = await this.productoService.create(dto);
+    return this.success(
+      'PRODUCT_CREATED', { productoId: product.id }, 'Producto creado exitosamente'
+    )
   }
 
   @Post('imagen/:id')
@@ -22,31 +30,49 @@ export class ProductoController {
   async uploadImage(
     @Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File, @Req() req: Request
   ) {
-    return this.productoService.updateImage(id, file.filename, req)
+    const imgUrl = await this.productoService.updateImage(id, file.filename, req)
+    return this.success(
+      'IMAGE_UPDATED', { url: imgUrl }, 'Imagen actualizada exitosamente'
+    )
   }
 
   @Get()
   async findAll(@Req() req: Request) {
-    return this.productoService.findAll(req);
+    const data = await this.productoService.findAll(req);
+    return this.success(
+      'PRODUCTS_FOUND', data, 'Productos encontrados exitosamente'
+    )
   }
 
   @Get('categoria/:id')
   async findByCategory(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
-    return this.productoService.findByCategory(id, req)
+    const data = await this.productoService.findByCategory(id, req)
+    return this.responseService.success(
+      'PRODUCTS_BY_CATEGORY_FOUND', data, 'Productos encontrados por categoria exitosamente'
+    )
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
-    return this.productoService.findOne(id, req);
+    const product = await this.productoService.findOne(id, req);
+    return this.success(
+      'PRODUCT_FOUND', product, 'Producto encontrado exitosamente'
+    )
   }
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductoDto, @Req() req: Request) {
-    return this.productoService.update(id, dto, req);
+    const product = await this.productoService.update(id, dto, req);
+    return this.success(
+      'PRODUCT_UPDATED', product, 'Producto actualizado exitosamente'
+    )
   }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productoService.remove(id);
+    await this.productoService.remove(id);
+    return this.success(
+      'PRODUCT_DELETED', null, 'Producto eliminado exitosamente'
+    )
   }
 }

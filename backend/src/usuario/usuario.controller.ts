@@ -22,6 +22,11 @@ export class UsuarioController {
     return this.usuarioService.findOne(+id);
   }
 
+  @Get()
+  async findByEmail(@Body() email: string){
+    return this.usuarioService.findByEmail(email)
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(+id, updateUsuarioDto);

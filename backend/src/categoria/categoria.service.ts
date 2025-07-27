@@ -4,7 +4,6 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Categoria } from './entities/categoria.entity';
 import { Repository } from 'typeorm';
-import { ResponseService } from '@common/services/response/response.service';
 
 @Injectable()
 export class CategoriaService {
@@ -12,7 +11,6 @@ export class CategoriaService {
   constructor(
     @InjectRepository(Categoria)
     private categoryRepository: Repository<Categoria>,
-    private readonly responseServices: ResponseService
   ) { }
 
   // ### Create function ###
@@ -26,19 +24,12 @@ export class CategoriaService {
     }
 
     const newCategory = await this.categoryRepository.create(dto)
-    await this.categoryRepository.save(newCategory);
-
-    return this.responseServices.success(
-      'CATEGORY_CREATED', newCategory, 'Categoria creada exitosamente'
-    )
+    return this.categoryRepository.save(newCategory);
   }
 
   // ### GetAll function ###
   async findAll() {
-    const results = await this.categoryRepository.find();
-    return this.responseServices.success(
-      'CATEGORIES_FOUND', results, 'Categorias encontradas exitosamente'
-    )
+    return this.categoryRepository.find();
   }
 
   // ### GetOne function ###
@@ -49,9 +40,7 @@ export class CategoriaService {
         code: 'CATEGORY_NOT_FOUND', message: 'Categoria no encontrada', data: null
       }, HttpStatus.NOT_FOUND)
     }
-    return this.responseServices.success(
-      'CATEGORY_FOUND', category, 'Categoria encontrada exitosamente'
-    )
+    return category
   }
 
   // ### Update function ###
@@ -65,11 +54,7 @@ export class CategoriaService {
     }
 
     const updateCategory = this.categoryRepository.merge(category, dto)
-    await this.categoryRepository.save(updateCategory)
-
-    return this.responseServices.success(
-      'CATEGORY_UPDATED', updateCategory, 'Categoria actualizada exitosamente'
-    )
+    return this.categoryRepository.save(updateCategory)
   }
 
   // ### Delete function ###
@@ -82,10 +67,6 @@ export class CategoriaService {
       }, HttpStatus.NOT_FOUND)
     }
 
-    await this.categoryRepository.remove(category)
-
-    return this.responseServices.success(
-      'CATEGORY_DELETED', null, 'Categoria eliminada exitosamente'
-    )
+    return this.categoryRepository.remove(category)
   }
 }

@@ -10,6 +10,7 @@ import { ProductoModule } from '@producto/producto.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ResponseModule } from '@common/services/response/response.module';
 import { Usuario } from '@usuario/entities/usuario.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { Usuario } from '@usuario/entities/usuario.entity';
     ResponseModule,
     CategoriaModule,
     ProductoModule,
-    UsuarioModule
+    UsuarioModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
